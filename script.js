@@ -44,54 +44,70 @@ window.onload = () => {
   // ** Helper function that makes dynamic API calls **
   const  fetchMovies = async (url, dom_element, path_type) => {
     // Use Fetch with the url passed down 
-    const response = await fetch(url);
-    const data = await response.json();
-    try{
-      console.log(data);
-    }catch(error){
+    fetch(url)
+    .then(response =>{
+      if(response.ok){
+        return response.json();
+      }
+      else{
+        throw new Error('something went wrong');
+      }
+    })
+    .then(data =>{
+      // console.log(data);
+      showMovies(data, dom_element, path_type);
+    })
+    .catch((error) =>{
       console.log(error);
-    }
+    })
+
     // Within Fetch get the response and call showMovies() with the data , dom_element, and path type
   }
-  const url = 'https://api.themoviedb.org/3/discover/tv?api_key=19f84e11932abbc79e6d83f82d6d1045&with_networks=213';
-  fetchMovies(url);
-  
-  //  ** Function that displays the movies to the DOM **
-  showMovies = (movies, dom_element, path_type) => {
-    
-    // Create a variable that grabs id or class
 
   
+
+  //  ** Function that displays the movies to the DOM **
+  let showMovies = (movies, dom_element, path_type) => {
+    
+    // Create a variable that grabs id or class
+    let movieEl = document.querySelector(dom_element);
+    // console.log(movies.result);
+    
+    
     // Loop through object
-  
-  
+    
+    for(let movie of movies.results){
+      // console.log(movie);
       // Within loop create an img element
-  
-  
+      let imgElement = document.createElement('img');
       // Set attribute
-  
-  
+      imgElement.setAttribute('data-id', movie.id);
       // Set source
-  
-  
+      imgElement.src = `https://image.tmdb.org/t/p/original${movie[path_type]}`;
       // Add event listener to handleMovieSelection() onClick
+      imgElement.addEventListener('click', e =>{
+        handleMovieSelection(e);
+      })
+      // Append the imageElement to the dom_element selected
+      movieEl.appendChild(imgElement);
+    }
+  }
   
     
-      // Append the imageElement to the dom_element selected
-  
-    }
-  
   // ** Function that fetches Netflix Originals **
   function getOriginals() {
-  
+    const url = 'https://api.themoviedb.org/3/discover/tv?api_key=19f84e11932abbc79e6d83f82d6d1045&with_networks=213';
+    fetchMovies(url, '.original__movies', 'poster_path');
   }
   // ** Function that fetches Trending Movies **
   function getTrendingNow() {
-  
+    const url =  'https://api.themoviedb.org/3/trending/movie/week?api_key=19f84e11932abbc79e6d83f82d6d1045';
+    fetchMovies(url, '#trending', 'backdrop_path');
   }
   // ** Function that fetches Top Rated Movies **
   function getTopRated() {
-  
+    const url =  'https://api.themoviedb.org/3/movie/top_rated?api_key=19f84e11932abbc79e6d83f82d6d1045&language=en-US&page=1';
+    fetchMovies(url, '#top_rated', 'backdrop_path');
   }
   
   // ** BONUS **
